@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 require('dotenv').config()
+app.use(express.json());
 
 app.get('/webhooks',  (req, res) => {
 
@@ -17,11 +18,12 @@ app.get('/webhooks',  (req, res) => {
 
 app.post('/webhooks',  (req, res) => {
     console.log('Got new message');
-    console.log(req.body);
+    console.log(req.body)
     res.sendStatus(200);
 });
 app.get('/', (req, res)=>{
     res.send("HELLO WORLD!!!!!!")
-})
+});
 
 app.listen(process.env.PORT);
+console.log(`Listening to port ${process.env.PORT}`)
