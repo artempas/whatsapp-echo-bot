@@ -20,5 +20,8 @@ app.post('/webhooks',  (req, res) => {
     console.log(req.body);
     res.sendStatus(200);
 });
+app.get('/', (req, res)=>{
+    res.send("HELLO WORLD!!!!!!")
+})
 
 app.listen(process.env.PORT);
