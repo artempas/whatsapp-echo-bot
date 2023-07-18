@@ -46,7 +46,7 @@ app.post('/webhooks',  async (req, res) => {
                 }),
 
                 headers: {
-                    Authorization: `Bearer ${process.env.WA_TOKEN}`,
+                    Authorization: `Bearer ${process.env["User-Access-Token"]}`,
                     'Content-type': 'application/json'
                 }
             });
