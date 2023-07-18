@@ -1,6 +1,5 @@
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const express = require('express')
-const https = require('https');
 const app = express()
 require('dotenv').config()
 app.use(express.json());
@@ -47,7 +46,7 @@ app.post('/webhooks',  async (req, res) => {
                 }),
 
                 headers: {
-                    Authorization: `Bearer EAADSOjtlMTEBACNvqcr0y4wVvblhQ3bnvh2x8ooAHeet7ZB30WVOZBqRSF4uXKdJZBa4VexBUMIWGRwlb4mZAg3axUdZBtFpACdjH4LT7YBuFaREgI8OVjv7lX31iBNOKgJq0FPY6fbFPzE1uqKld6l2VakXFJDxYVkvyVRPk013YQs6WCZBaYDZCZAf294qZCZAK6ZAymqmM199gZDZD`,
+                    Authorization: `Bearer ${process.env.WA_TOKEN}`,
                     'Content-type': 'application/json'
                 }
             });
