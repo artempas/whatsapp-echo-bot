@@ -20,9 +20,12 @@ app.get('/webhooks',  (req, res) => {
 
 function parse_user(change){
     return {
+
         id: change.value.metadata.phone_number_id,
-        name: change.contacts[0].profile.name,
-        phone_number: change.contacts[0].wa_id
+        name: change.value.contacts[0].profile.name,
+        phone_number: '78'+change.value.contacts[0].wa_id.slice(1)
+        // phone_number: change.value.contacts[0].wa_id
+        // TODO UNCOMMENT FOR PROD
     }
 }
 
@@ -39,9 +42,10 @@ function parse_message(message){
         video_url: undefined,   // Valid for 5 mins. In order to download asset u should provide auth header
         document_url: undefined // Valid for 5 mins. In order to download asset u should provide auth header
     };
+    console.log(`Message type is ${message.type}`)
     switch (message.type){
         case 'text':
-            result.text = message.text;
+            result.text = message.text.body;
             break;
         case 'image':
             result.text = message.image.caption ?? message.text;
@@ -79,10 +83,11 @@ app.post('/webhooks',   (req, res) => {
         req.body.entry[0].changes[0].value.messages &&
         req.body.entry[0].changes[0].value.messages[0]
     ) {
-        let message = parse_message(req.body.entry[0].changes[0].value.message);
+        let message = parse_message(req.body.entry[0].changes[0].value.messages[0]);
         let user = parse_user(req.body.entry[0].changes[0]);
         const phone_number_id = req.body.entry[0].changes[0].value.metadata.phone_number_id;
         const url = `https://graph.facebook.com/${process.env.Version}/${phone_number_id}/messages`;
+        console.log(`RECIPIENT PHONE NUMBER IS ${user.phone_number}`)
         Promise.all([
                 fetch(url, // Send echo message
                     {
@@ -90,7 +95,7 @@ app.post('/webhooks',   (req, res) => {
                         body: JSON.stringify({
                             "messaging_product": "whatsapp",
                             "recipient_type": "individual",
-                            "to": user.id,
+                            "to": user.phone_number,
                             "type": "text",
                             "text": {
                                 "body": `Message data:\n${JSON.stringify(message)}`
@@ -106,7 +111,7 @@ app.post('/webhooks',   (req, res) => {
                         body: JSON.stringify({
                             "messaging_product": "whatsapp",
                             "recipient_type": "individual",
-                            "to": user.id,
+                            "to": user.phone_number,
                             "type": "image",
                             "image": {
                                 link: "https://picsum.photos/1920/1080"
@@ -120,7 +125,7 @@ app.post('/webhooks',   (req, res) => {
                         body: JSON.stringify({
                             "messaging_product": "whatsapp",
                             "recipient_type": "individual",
-                            "to": user.id,
+                            "to": user.phone_number,
                             "type": "document",
                             "document": {
                                 link: "https://base.mcn.ru/api/public/api/file/download/0b2b4681781c9530c492ec9204f7a0d1.pdf",
@@ -135,7 +140,7 @@ app.post('/webhooks',   (req, res) => {
                         body: JSON.stringify({
                             "messaging_product": "whatsapp",
                             "recipient_type": "individual",
-                            "to": user.id,
+                            "to": user.phone_number,
                             "type": "video",
                             "video": {
                                 link: "https://base.mcn.ru/api/public/api/file/download/ea9c1271f2ef0759663278ed4d2033be.mp4",
@@ -150,7 +155,7 @@ app.post('/webhooks',   (req, res) => {
                         body: JSON.stringify({
                             "messaging_product": "whatsapp",
                             "recipient_type": "individual",
-                            "to": user.id,
+                            "to": user.phone_number,
                             "type": "interactive",
                             "interactive": {
                                 "type": "button",
